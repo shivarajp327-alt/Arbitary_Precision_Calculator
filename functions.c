@@ -160,11 +160,11 @@ int compare_lists(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2)
 void display_result(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,Dlist *headR,Dlist *tailR,char oper)
 {
     print_list(head1,tail1);
-    printf("\n");
-    printf("%c \n",oper);
+   // printf("\n");
+    printf(" %c ",oper);
     print_list(head2,tail2);
-    printf("\n");
-    printf("= \n");
+   // printf("\n");
+    printf(" = ");
     print_list(headR,tailR);
     printf("\n");
 }

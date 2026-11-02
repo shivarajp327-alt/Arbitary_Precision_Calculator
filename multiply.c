@@ -20,7 +20,7 @@ void multiply_operation(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,Dlis
             while(temp1 != NULL)
             {
                 int data = (temp1->data * temp2->data) + carry;
-                temp1 = temp1->next;
+                temp1 = temp1->prev;
                 carry = data/10;
                 insert_first(&re1_head,&re1_tail,data%10);
             }
@@ -30,16 +30,19 @@ void multiply_operation(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,Dlis
             while(temp1 != NULL)
             {
                 int data = (temp1->data * temp2->data) + carry;
-                temp1 = temp1->next;
+                temp1 = temp1->prev;
                 carry = data/10;
                 insert_first(&re2_head,&re2_tail,data%10);
             }
         }
-        if(count == 0)
-            insert_first(&re1_head,&re1_tail,carry);
-        else
-            insert_first(&re2_head,&re2_tail,carry);
-
+        if(carry)
+        {
+            if(count == 0)
+                insert_first(&re1_head,&re1_tail,carry);
+            else
+                insert_first(&re2_head,&re2_tail,carry);
+        }
+        
         if(re1_head != NULL && re2_head != NULL)
         {
             add_operation(re1_head,re1_tail,re2_head,re2_tail,headR,tailR);
@@ -47,8 +50,8 @@ void multiply_operation(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,Dlis
             delete_list(&re2_head,&re1_tail);
             re1_head = *headR;
             re1_tail = *tailR;
-            headR = NULL;
-            tailR = NULL;
+            *headR = NULL;
+            *tailR = NULL;
         }
         temp2 = temp2->prev;
     }
