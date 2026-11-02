@@ -51,5 +51,5 @@ void sub_operation(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,Dlist **h
             tail2 = tail2->prev;
         }
     }
-    remove_zero(headR,tailR);
+    remove_zero(headR);
 }

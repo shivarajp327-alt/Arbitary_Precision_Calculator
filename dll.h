@@ -20,7 +20,7 @@ int node_creation(Dlist **head,Dlist **tail,char *str);
 int insert_last(Dlist **head,Dlist **tail,int data);
 void print_list(Dlist *head,Dlist *tail);
 int delete_list(Dlist **head,Dlist **tail);
-void remove_zero(Dlist **head,Dlist **tail);
+void remove_zero(Dlist **head);
 int insert_first(Dlist **head,Dlist **tail,int data);
 void get_list_len(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,int *list1_count,int *list2_count);
 int compare_lists(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2);

@@ -31,10 +31,10 @@ void calculator(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,char oper)
 
         break;
 
-        // case '/':
-        //     divide_operation(head1,tail1,head2,tail2,&headR,&tailR);
-        //     display_result(head1,tail1,head2,tail2,headR,tailR,oper);
-        // break;
+        case '/':
+            divide_operation(head1,tail1,head2,tail2,&headR,&tailR);
+            display_result(head1,tail1,head2,tail2,headR,tailR,oper);
+        break;
 
         default:
         printf("Invalid operator\n");
@@ -168,13 +168,13 @@ void display_result(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,Dlist *h
     print_list(headR,tailR);
     printf("\n");
 }
-void remove_zero(Dlist **head,Dlist **tail)
+void remove_zero(Dlist **head)
 {
-    while((*head)->data == 0)
+    while((*head)!= NULL && (*head)->data == 0 && (*head)->next !=NULL)
     {
-        Dlist *temp = *head;
+      //  Dlist *temp = *head;
         *head=(*head)->next;
         (*head)->prev=NULL;
-        free(temp);
+      //  free(temp);
     }
 }
