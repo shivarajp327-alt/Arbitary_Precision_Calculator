@@ -2,13 +2,16 @@
 
 void print_list(Dlist *head,Dlist *tail)
 {
-   // printf("head -->");
+    if(head->data == '-')
+    {
+        printf("%c",head->data);
+        head = head->next;
+    }
     while(head!=NULL)
     {
         printf(" %d",head->data);
         head = head->next;
     }
-   // printf(" tail\n");
 }
 
 int main(int argc,char *argv[])
