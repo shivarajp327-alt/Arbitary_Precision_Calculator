@@ -1,13 +1,14 @@
-#ifndef DLL_H
-#define DLL_L
+#ifndef LIST_H
+#define LIST_H
 
-#include<stdio.h>
-#include<stdlib.h>
-
-#define FAILURE -1
 #define SUCCESS 0
-#define SWAP 1
-#define NO_SWAP 2
+#define FAILURE -1
+#define NORMAL -2
+#define SWAP -3
+#define LIST_IS_EMPTY -4
+
+#include<stdlib.h>
+#include<stdio.h>
 
 typedef struct node
 {
@@ -16,19 +17,21 @@ typedef struct node
     struct node *next;
 }Dlist;
 
-int node_creation(Dlist **head,Dlist **tail,char *str);
+
+int validation(char *,char *);
+int remove_zero(Dlist **head);
+int printDll(Dlist *head,Dlist *tail);
+int delete_list(Dlist **head, Dlist **tail);
 int insert_last(Dlist **head,Dlist **tail,int data);
-void print_list(Dlist *head,Dlist *tail);
-int delete_list(Dlist **head,Dlist **tail);
-void remove_zero(Dlist **head);
 int insert_first(Dlist **head,Dlist **tail,int data);
-void get_list_len(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,int *list1_count,int *list2_count);
+int create_node(Dlist **head,Dlist **tail, char *str);
 int compare_lists(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2);
-void calculator(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,char oper);
-void add_operation(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,Dlist **headR,Dlist **tailR);
-void sub_operation(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,Dlist **headR,Dlist **tailR);
-void multiply_operation(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,Dlist **headR,Dlist **tailR);
-void divide_operation(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,Dlist **headR,Dlist **tailR);
-void display_result(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,Dlist *headR,Dlist *tailR,char oper);
+void calculator(Dlist **head1,Dlist **tail1,Dlist **head2,Dlist **tail2,char opr);
+char operation_type(Dlist **head1, Dlist **head2, char opr, char *sign);
+int add_operation(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,Dlist **headR,Dlist **tailR);
+int sub_operation(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,Dlist **headR,Dlist **tailR);
+int mul_operation(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,Dlist **headR,Dlist **tailR,char sign);
+int div_operation(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,Dlist **headR,Dlist **tailR);
+void get_list_len(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,int *list1_count,int *list2_count);
 
 #endif

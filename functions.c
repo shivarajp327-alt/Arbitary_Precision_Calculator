@@ -1,62 +1,240 @@
 #include "dll.h"
 
-void calculator(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,char oper)
+
+int validation(char *str1,char *str2)
 {
-    Dlist *headR = NULL;
-    Dlist *tailR = NULL;
-    int ret;
-    switch (oper)
+    for(int i=0;str1[i]!=0;i++)
     {
-        case '+':
-            add_operation(head1,tail1,head2,tail2,&headR,&tailR);
-            display_result(head1,tail1,head2,tail2,headR,tailR,oper);
-         break;
-
-        case '-':
-            if((ret = compare_lists(head1,tail1,head2,tail2)) == NO_SWAP)
-            {
-                sub_operation(head1,tail1,head2,tail2,&headR,&tailR);
-            }
-            else if((ret = compare_lists(head1,tail1,head2,tail2)) == SWAP)
-            {
-                sub_operation(head2,tail2,head1,tail1,&headR,&tailR);
-                insert_first(&headR,&tailR,'-');
-            }
-            display_result(head1,tail1,head2,tail2,headR,tailR,oper);
-        break;
-
-        case 'x':
-        case 'X':
-            multiply_operation(head1,tail1,head2,tail2,&headR,&tailR);
-
-        break;
-
-        case '/':
-            divide_operation(head1,tail1,head2,tail2,&headR,&tailR);
-            display_result(head1,tail1,head2,tail2,headR,tailR,oper);
-        break;
-
-        default:
-        printf("Invalid operator\n");
+        if(str1[i]=='-' || str1[i]=='+')
+            continue;
+        if(str1[i]<'0' || str1[i]>'9')
+            return FAILURE;
     }
-    
-}
-
-int node_creation(Dlist **head,Dlist **tail,char *str)
-{
-    for(int i=0;str[i]!=0 ;i++)
+    for(int i=0;str2[i]!=0;i++)
     {
-        int data = str[i] - 48;
-        insert_last(head,tail,data);
+        if(str2[i]=='-' || str2[i]=='+')
+            continue;
+        if(str2[i]<'0' ||str2[i]>'9')
+            return FAILURE;
     }
     return SUCCESS;
 }
 
-int delete_list(Dlist **head,Dlist **tail)
+
+char operation_type(Dlist **head1, Dlist **head2, char opr, char *sign)
+{
+    char sign1 = '+';
+    char sign2 = '+';
+
+    if((*head1)->data == '+' || (*head1)->data == '-')
+    {
+        sign1 = (*head1)->data;
+        *head1 = (*head1)->next;
+        (*head1)->prev = NULL;
+    }
+
+    if((*head2)->data == '+' || (*head2)->data == '-')
+    {
+        sign2 = (*head2)->data;
+        *head2 = (*head2)->next;
+        (*head2)->prev = NULL;
+    }
+
+    switch(opr)
+    {
+        case '+':
+
+            if(sign1 == sign2)
+            {
+                *sign = sign1;
+                return '+';
+            }
+            else
+            {
+                if(compare_lists(*head1,NULL,*head2,NULL) == NORMAL)
+                    *sign = sign1;
+                else
+                    *sign = sign2;
+
+                return '-';
+            }
+
+        case '-':
+            if(sign1 == '+' && sign2 == '+')
+            {
+                if(compare_lists(*head1,NULL,*head2,NULL) == NORMAL)
+                    *sign = '+';
+                else
+                    *sign = '-';
+
+                return '-';
+            }
+            else if(sign1 == '-' && sign2 == '-')
+            {
+                if(compare_lists(*head1,NULL,*head2,NULL) == NORMAL)
+                    *sign = '-';
+                else
+                    *sign = '+';
+
+                return '-';
+            }
+            else if(sign1 == '+' && sign2 == '-')
+            {
+                *sign = '+';
+                return '+';
+            }
+            else
+            {
+                *sign = '-';
+                return '+';
+            }
+        case 'x':
+        case 'X':
+
+            *sign = (sign1 == sign2) ? '+' : '-';
+            return 'x';
+
+        case '/':
+
+            *sign = (sign1 == sign2) ? '+' : '-';
+            return '/';
+    }
+
+    return opr;
+}
+
+
+void calculator(Dlist **head1,Dlist **tail1,Dlist **head2,Dlist **tail2,char opr)
+{
+    Dlist *headR = NULL;
+    Dlist *tailR = NULL;
+    int ret;
+    char sign = '+';
+
+    opr = operation_type(head1,head2,opr,&sign);
+
+    switch(opr)
+    {
+        case '+':
+            if(add_operation(*head1,*tail1,*head2,*tail2,&headR,&tailR)==FAILURE)
+            {
+                return;
+            }
+
+            if(sign == '-')
+                insert_first(&headR,&tailR,'-');
+
+            if(printDll(headR,tailR)==LIST_IS_EMPTY)
+            {
+                printf("INFO: List is Empty\n");
+            }
+        break;
+
+        case '-':
+            ret = compare_lists(*head1,*tail1,*head2,*tail2);
+
+            if(ret == NORMAL)
+            {
+                if(sub_operation(*head1,*tail1,*head2,*tail2,&headR,&tailR)==FAILURE)
+                {
+                    return;
+                }  
+            }
+            else if(ret == SWAP)
+            {
+                if(sub_operation(*head2,*tail2,*head1,*tail1,&headR,&tailR)==FAILURE)
+                {
+                    return;
+                }
+            }
+            if(sign == '-')
+                insert_first(&headR,&tailR,'-');  
+
+            if(printDll(headR,tailR)==LIST_IS_EMPTY)
+            {
+                printf("INFO: List is Empty\n");
+            }
+        break;
+
+        case 'x':
+        case 'X':
+            if(mul_operation(*head1,*tail1,*head2,*tail2,&headR,&tailR,sign)==FAILURE)
+            {
+                return;
+            }
+        break;
+
+        case '/':
+            if(div_operation(*head1,*tail1,*head2,*tail2,&headR,&tailR)==FAILURE)
+            {
+                return;
+            }
+            remove_zero(&headR);
+            if(sign == '-')
+                insert_first(&headR,&tailR,'-');
+
+            if(printDll(headR,tailR)==LIST_IS_EMPTY)
+            {
+                printf("INFO: List is Empty\n");
+            }
+        break;
+
+        default:
+            printf("Invalid operator\n");
+    }
+    printf("\n");
+}
+
+
+int remove_zero(Dlist **head)
 {
     if(*head == NULL)
         return FAILURE;
-        
+
+    while((*head)!=NULL && (*head)->next!=NULL && (*head)->data ==0)
+    {
+        Dlist *temp =*head;
+        *head = (*head)->next;
+        (*head)->prev=NULL;
+        free(temp);
+    }
+    return SUCCESS;
+}
+
+
+int printDll(Dlist *head, Dlist *tail)
+{
+    if(head == NULL)
+        return LIST_IS_EMPTY;
+
+    
+    if((head->data == '-'|| head->data == '+') && (head->next!=NULL && head->next->data == 0 && head->next->next == NULL))
+    {
+        printf("0 ");
+        return SUCCESS;
+    }
+
+    if(head->data == '-' ||head->data == '+' )
+    {
+        printf("%c",head->data);
+        head = head->next;
+    }
+    remove_zero(&head);
+    while(head!=NULL)
+    {
+        printf("%d",head->data);
+        head = head->next;
+    }
+    printf(" ");
+    return SUCCESS;
+}
+
+
+int delete_list(Dlist **head, Dlist **tail)
+{
+    if(*head == NULL)
+        return FAILURE;
+    
     while(*head != NULL)
     {
         Dlist *temp = *head;
@@ -66,115 +244,133 @@ int delete_list(Dlist **head,Dlist **tail)
     }
     *head = NULL;
     *tail = NULL;
+
     return SUCCESS;
 }
+
+
+int create_node(Dlist **head,Dlist **tail,char *str)
+{
+    int data;
+    for(int i=0;str[i]!=0;i++)
+    {
+        if(str[i]=='+')
+            data =  43;
+        else if(str[i]=='-')
+            data = 45;
+        else
+        data =  str[i]-48;
+
+        if(insert_last(head,tail,data)==FAILURE)
+        {
+            printf("ERROR: Unable to insert data at last\n");
+            return FAILURE;
+        }
+    }
+
+    return SUCCESS;
+}
+
 
 int insert_last(Dlist **head,Dlist **tail,int data)
 {
     if(*head == NULL && *tail == NULL)
-    {
-        Dlist *newnode = malloc(sizeof(Dlist));
-        if(newnode == NULL)
-        return FAILURE;
-        newnode->data = data;
-        newnode->prev = NULL;
-        newnode->next = NULL;
-        *head = newnode;
-        *tail = newnode;
-        return SUCCESS;
-    }
+        {
+            Dlist *newnode = malloc(sizeof(Dlist));
+            if(newnode == NULL)
+                return FAILURE;
+
+            newnode->data = data;
+            newnode->next = NULL;
+            newnode->prev = NULL;
+            *head = newnode;
+            *tail = newnode;
+            return SUCCESS;
+        }
+
     Dlist *newnode = malloc(sizeof(Dlist));
         if(newnode == NULL)
-        return FAILURE;
+           return FAILURE;
+
         newnode->data = data;
-        newnode->prev = NULL;
         newnode->next = NULL;
         newnode->prev = *tail;
         (*tail)->next = newnode;
         *tail = newnode;
-    return SUCCESS; 
+
+    return SUCCESS;
 }
+
+
 int insert_first(Dlist **head,Dlist **tail,int data)
 {
     if(*head == NULL && *tail == NULL)
-    {
-        Dlist *newnode = malloc(sizeof(Dlist));
-        if(newnode == NULL)
-        return FAILURE;
-        newnode->data = data;
-        newnode->prev = NULL;
-        newnode->next = NULL;
-        *head = newnode;
-        *tail = newnode;
-        return SUCCESS;
-    }
+        {
+            Dlist *newnode = malloc(sizeof(Dlist));
+            if(newnode == NULL)
+                return FAILURE;
+
+            newnode->data = data;
+            newnode->next = NULL;
+            newnode->prev = NULL;
+            *head = newnode;
+            *tail = newnode;
+            return SUCCESS;
+        }
+
     Dlist *newnode = malloc(sizeof(Dlist));
         if(newnode == NULL)
-        return FAILURE;
+           return FAILURE;
+
         newnode->data = data;
         newnode->prev = NULL;
-        newnode->next = NULL;
         newnode->next = *head;
         (*head)->prev = newnode;
         *head = newnode;
-    return SUCCESS; 
+
+    return SUCCESS;
 }
+
 
 void get_list_len(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,int *list1_count,int *list2_count)
 {
-    while(head1 != NULL)
+    while(head1!=NULL)
     {
         (*list1_count)++;
         head1 = head1->next;
     }
-     while(head2 != NULL)
+    while(head2!=NULL)
     {
         (*list2_count)++;
         head2 = head2->next;
     }
+    // printf("\n%d %d\n",*list1_count,*list2_count);
 }
+
+
 int compare_lists(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2)
 {
-    int list1_len =0,list2_len =0;
-    get_list_len(head1,tail1,head2,tail2,&list1_len,&list2_len);
-    if(list1_len < list2_len)
+    int list1_count = 0,list2_count = 0;
+    get_list_len(head1,tail1,head2,tail2,&list1_count,&list2_count);
+
+    if(list1_count > list2_count)
+        return NORMAL;
+    else if(list1_count < list2_count)
         return SWAP;
-    else if(list1_len > list2_len)
-        return NO_SWAP;
-    else if(list1_len == list2_len)
+    else if(list1_count == list2_count)
     {
         while(head1->data == head2->data)
         {
             head1 = head1->next;
             head2 = head2->next;
-            if(head1 == NULL && head2 == NULL)
-                return NO_SWAP;
+            
+            if(head1==NULL && head2==NULL)
+            return NORMAL;
         }
-       if(head1->data < head2->data)
-            return SWAP;
-        else if(head1->data > head2->data)
-            return NO_SWAP;
-    }
-}
 
-void display_result(Dlist *head1,Dlist *tail1,Dlist *head2,Dlist *tail2,Dlist *headR,Dlist *tailR,char oper)
-{
-    print_list(head1,tail1);
-   // printf("\n");
-    printf(" %c ",oper);
-    print_list(head2,tail2);
-   // printf("\n");
-    printf(" = ");
-    print_list(headR,tailR);
-    printf("\n");
-}
-void remove_zero(Dlist **head)
-{
-    while((*head)!= NULL && (*head)->data == 0 && (*head)->next !=NULL)
-    {
-      //  Dlist *temp = *head;
-        *head=(*head)->next;
-        (*head)->prev=NULL;
-      //  free(temp);
+        if(head1->data > head2->data)
+            return NORMAL;
+        else if(head1->data < head2->data)
+            return SWAP;
     }
 }
